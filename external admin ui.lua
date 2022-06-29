@@ -6,8 +6,9 @@ local Clip
 local Noclipping
 local FoundPlayer
 local tempstr
-local CharacterAddedConnection
-local PlayerAddedConnection
+local floatDied
+local strtocompare
+local arg
 local HttpService = game:GetService'HttpService'
 local plr = game:GetService'Players'.LocalPlayer
 local plrs = game:GetService'Players'
@@ -16,7 +17,7 @@ local plrh = plrw:FindFirstChild('Humanoid')
 local plrhrp = plrw:FindFirstChild('HumanoidRootPart')
 local RunService = game:GetService('RunService')
 local workspace = game:GetService('Workspace')
-IYMouse = plr:GetMouse()
+local MPos = plr:GetMouse()
 local gs = GetService
 local notif = loadstring(game:HttpGet('https://raw.githubusercontent.com/fheahdythdr/ui-libs-ui-lib-backups/main/function%20things/notifs.lua'))() 
 local SendNotif = notif:Init()
@@ -26,9 +27,7 @@ plr.CharacterAdded:Connect(function(nchar)
     plrh = plrw.Humanoid
 end)
 local ESPToggle = false
-local chams = false
 local ESP = loadstring(game:HttpGet("https://raw.githubusercontent.com/Kiriot22/ESP-Lib/main/ESP.lua"))()
-local plrtable = {}
 
 local function RefreshConsole(name, initialcolour, startingtext_or_nil)
     rconsoleclear()
@@ -48,13 +47,6 @@ end
 
 local function clearconsole()
     RefreshConsole("RConsole Admin", "@@CYAN@@")
-end
-local function ListCommands()
-    rconsoleprint("@@CYAN@@")
-    rconsoleprint("Commands are:\nclr (Clears console)\nsetwalkspeed [speed]\nsetjumppower [jumppower]\nnoclip\nclip\ntp/to [player]\nfloat\nunfloat\nesp\nchams\n\n")
-    rconsoleprint("@@MAGENTA@@")
-    rconsoleprint("Enter a command:\n")
-    rconsoleprint("@@WHITE@@")
 end
 
 local function AwaitConsoleInput()
@@ -84,6 +76,26 @@ local function FindName(name)
         end
     end
 end
+local function SendError(ErrorText)
+    rconsoleprint("@@RED@@")
+    rconsoleprint("<ERROR> "..ErrorText)
+    rconsoleprint("@@WHITE@@")
+end
+
+RefreshConsole("RConsole Admin", "@@CYAN@@")
+local function SetCyan()
+    rconsoleprint("@@CYAN@@")
+end
+local function SetWhite()
+    rconsoleprint("@@WHITE@@")
+end
+local function SetRed()
+    rconsoleprint("@@RED@@")
+end
+local function SetPurple()
+    rconsoleprint("@@MAGENTA@@")
+end
+
 function ApplyModel(model)
     if not model:FindFirstChild("Highlight") then
         local highlight = Instance.new("Highlight")
@@ -99,6 +111,23 @@ function ApplyPlayer(model)
     end
 end
 
+local cmdtable =
+{   
+    {
+        names = {"setws", "ws"},
+        callback = function(speed)
+            if speed ~= nil then
+                SetCyan()
+                rconsoleprint("setting walkspeed to "..speed.."\n")
+                game:GetService("Players").LocalPlayer.Character.Humanoid.WalkSpeed = tonumber(speed)
+                wait(.25)
+                rconsoleprint("walkspeed has been set to "..speed.."\n")
+                SetWhite()
+            end
+        end
+    }
+}
+
 task.spawn(function()
     while wait(1) do
         plrtable = {}
@@ -108,130 +137,114 @@ task.spawn(function()
     end
 end)
 
-RefreshConsole("RConsole Admin", "@@CYAN@@")
-ListCommands()
+local function AddCmd(name, alias, func)
+    local cmd = {}
+    if alias then
+        cmd.names = {name, alias}
+    else
+        cmd.names = {name}
+    end
+    cmd.callback = func
+    table.insert(cmdtable, cmd)
+end
 
-local cmdtable = {"clr", "setwalkspeed", "cmds", "setjumppower", "noclip", "clip", "tp/to", "float", "unfloat", "esp"}
+AddCmd("chams", nil, function()
+    chams = not chams
+    if chams then
+        for _, Player in next, game:GetService("Players"):GetChildren() do
+            ApplyModel(Player) wait()
+        end
+        for i,v in pairs(game:GetService("Players"):GetChildren()) do
+            CharacterAddedConnection = v.CharacterAdded:Connect(function(character)
+                ApplyPlayer(character)
+            end)
+        end
+        rconsoleprint("@@CYAN@@")
+        rconsoleprint("Chams has been enabled.\n")
+        rconsoleprint("Chams is fairly buggy.")
+        rconsoleprint("@@WHITE@@")
+    else
+        for _, Player in next, plrs:GetChildren() do
+            if Player.Character:FindFirstChild("Highlight") then
+                Player.Character:FindFirstChild("Highlight"):Destroy()
+            end
+        end
+        for i,v in pairs(workspace:GetDescendants()) do
+            if table.find(plrtable, v.Name) then
+                if v:FindFirstChild("Highlight") then v:FindFirstChild("Highlight"):Destroy() end
+            end
+        end
+        CharacterAddedConnection:Disconnect()
+        rconsoleprint("@@CYAN@@")
+        rconsoleprint("Chams has been disabled.\n")
+        rconsoleprint("Chams is fairly buggy, expect highlights to stay sometimes")
+        rconsoleprint("@@WHITE@@")
+    end
+end)
 
-while true do
-    rconsoleprint(">")
-    local str = AwaitConsoleInput()
-    if str:lower() == "clr" then
-        clearconsole()
-        ListCommands()
-    elseif string.sub(str:lower(), 1, string.len("setwalkspeed")) == "setwalkspeed" then
-        str = string.split(str, " ")
-        str = str[2]
-        rconsoleprint("setting walkspeed to "..str.."\n")
-        game:GetService("Players").LocalPlayer.Character.Humanoid.WalkSpeed = tonumber(str)
-        wait(.25)
-        rconsoleprint("walkspeed has been set to "..str.."\n")
-    elseif str:lower() == "cmds" then
-        ListCommands()
-    elseif str:lower() == "break" then
-        rconsoleclear()
-        rconsoleprint("broken while true do chain")
-        wait(1)
-        rconsoleclear()
-        rconsolename(identifyexecutor().. " Console")
-        break
-    elseif string.sub(str:lower(), 1, string.len("setjumppower")) == "setjumppower" then
-        str = string.split(str, " ")
-        str = str[2]
-        rconsoleprint("setting jump power to "..str.."\n")
-        game:GetService("Players").LocalPlayer.Character.Humanoid.JumpPower = tonumber(str)
-        wait(.25)
-        rconsoleprint("jump power has been set to "..str.."\n")
-    elseif str:lower() == "noclip" then
-        Clip = false
-        Noclipping = game:GetService('RunService').Stepped:Connect(NoclipLoop)
-        rconsoleprint("@@CYAN@@")
-        rconsoleprint("<INFO> Noclip enabled.\n")
-        rconsoleprint("@@WHITE@@")
-    elseif str:lower() == "clip" then
-        Clip = true
-        Noclipping:Disconnect()
-        rconsoleprint("@@CYAN@@")
-        rconsoleprint("<INFO> Noclip disabled.\n")
-        rconsoleprint("@@WHITE@@")
-    elseif string.sub(str:lower(), 1, string.len("tp")) == "tp" then
-        str1 = string.split(str, " ")
-        str = str1[2]
-        --[[for i,v in pairs(plrs:GetChildren()) do
-            local subbedname = string.sub(v.Name:lower(), 1, string.len(str))
-            local subbeddisplayname = string.sub(v.DisplayName:lower(), 1, string.len(str))
-            
-            if (subbedname == name) then
-                FoundPlayer = tostring(v)
-            elseif (subbeddisplayname == name) then
-                FoundPlayer = tostring(v)
-            end
-        end]]
-        FoundPlayer = FindName(str)
-        if FoundPlayer then
-            rconsoleprint("teleporting to "..FoundPlayer.."\n")
-            plrhrp.CFrame = workspace:FindFirstChild(FoundPlayer):FindFirstChild("HumanoidRootPart").CFrame
-            rconsoleprint("teleported to "..FoundPlayer.."\n")
+local function ListCommands()
+    rconsoleprint("@@CYAN@@")
+    rconsoleprint("Commands are:\n")
+    for i,v in pairs(cmdtable) do
+        if v.names[1] and v.names[2] then
+            rconsoleprint(""..v.names[1].."/"..v.names[2].."\n")
         else
-            rconsoleprint("@@RED@@")
-            rconsoleprint("<ERROR> Couldn't find a player whose name started with "..str.."\n")
-            rconsoleprint("@@WHITE@@")
+            rconsoleprint(""..v.names[1].."\n")
         end
-    elseif string.sub(str:lower(), 1, string.len("to")) == "to" then
-        str1 = string.split(str, " ")
-        str = str1[2]
-        --[[for i,v in pairs(plrs:GetChildren()) do
-            local subbedname = string.sub(v.Name:lower(), 1, string.len(str))
-            local subbeddisplayname = string.sub(v.DisplayName:lower(), 1, string.len(str))
-            
-            if (subbedname == name) then
-                FoundPlayer = tostring(v)
-            elseif (subbeddisplayname == name) then
-                FoundPlayer = tostring(v)
-            end
-        end]]
-        FoundPlayer = FindName(str)
-        if FoundPlayer then
-            rconsoleprint("teleporting to "..FoundPlayer.."\n")
-            plrhrp.CFrame = workspace:FindFirstChild(FoundPlayer):FindFirstChild("HumanoidRootPart").CFrame
-            rconsoleprint("teleported to "..FoundPlayer.."\n")
-        else
-            rconsoleprint("@@RED@@")
-            rconsoleprint("<ERROR> Couldn't find a player whose name started with "..str.."\n")
-            rconsoleprint("@@WHITE@@")
-        end
-    elseif str:lower() == "float" then
-        if not plrw:FindFirstChild("oogeABAOGAGOBAOGOAG") then
-            task.spawn(function()
-                local Float = Instance.new('Part')
-                Float.Name = "oogeABAOGAGOBAOGOAG"
-                Float.Parent = plrw
-                Float.Transparency = 1
-                Float.Size = Vector3.new(2,0.2,1.5)
-                Float.Anchored = true
-                local FloatValue = -3.1
-                Float.CFrame = plrhrp.CFrame * CFrame.new(0,FloatValue,0)
-                qUp = IYMouse.KeyUp:Connect(function(KEY)
-                    if KEY == 'q' then
-                        FloatValue = FloatValue + 0.5
-                    end
-                end)
-                eUp = IYMouse.KeyUp:Connect(function(KEY)
-                    if KEY == 'e' then
-                        FloatValue = FloatValue - 0.5
-                    end
-                end)
-                qDown = IYMouse.KeyDown:Connect(function(KEY)
-                    if KEY == 'q' then
-                        FloatValue = FloatValue - 0.5
-                    end
-                end)
-                eDown = IYMouse.KeyDown:Connect(function(KEY)
-                    if KEY == 'e' then
-                        FloatValue = FloatValue + 0.5
-                    end
-                end)
-                floatDied = plrw:FindFirstChildOfClass('Humanoid').Died:Connect(function()
+    end
+    rconsoleprint("@@MAGENTA@@")
+    rconsoleprint("\n\nEnter a command:\n\n")
+    rconsoleprint("@@WHITE@@")
+end
+
+AddCmd("clr", "clrlogs", function()
+    clearconsole()
+    ListCommands()
+end)
+AddCmd("float", "platform", function()
+    if not plrw:FindFirstChild("oogeABAOGAGOBAOGOAG") then
+        task.spawn(function()
+            local Float = Instance.new('Part')
+            Float.Name = "oogeABAOGAGOBAOGOAG"
+            Float.Parent = plrw
+            Float.Transparency = 1
+            Float.Size = Vector3.new(2,0.2,1.5)
+            Float.Anchored = true
+            local FloatValue = -3.1
+            Float.CFrame = plrhrp.CFrame * CFrame.new(0,FloatValue,0)
+            qUp = MPos.KeyUp:Connect(function(KEY)
+                if KEY == 'q' then
+                    FloatValue = FloatValue + 0.5
+                end
+            end)
+            eUp = MPos.KeyUp:Connect(function(KEY)
+                if KEY == 'e' then
+                    FloatValue = FloatValue - 0.5
+                end
+            end)
+            qDown = MPos.KeyDown:Connect(function(KEY)
+                if KEY == 'q' then
+                    FloatValue = FloatValue - 0.5
+                end
+            end)
+            eDown = MPos.KeyDown:Connect(function(KEY)
+                if KEY == 'e' then
+                    FloatValue = FloatValue + 0.5
+                end
+            end)
+            floatDied = plrw:FindFirstChildOfClass('Humanoid').Died:Connect(function()
+                FloatingFunc:Disconnect()
+                Float:Destroy()
+                qUp:Disconnect()
+                eUp:Disconnect()
+                qDown:Disconnect()
+                eDown:Disconnect()
+                floatDied:Disconnect()
+            end)
+            local function FloatPadLoop()
+                if plrw:FindFirstChild("oogeABAOGAGOBAOGOAG") and plrhrp then
+                    Float.CFrame = plrhrp.CFrame * CFrame.new(0,FloatValue,0)
+                else
                     FloatingFunc:Disconnect()
                     Float:Destroy()
                     qUp:Disconnect()
@@ -239,80 +252,92 @@ while true do
                     qDown:Disconnect()
                     eDown:Disconnect()
                     floatDied:Disconnect()
-                end)
-                local function FloatPadLoop()
-                    if plrw:FindFirstChild("oogeABAOGAGOBAOGOAG") and plrhrp then
-                        Float.CFrame = plrhrp.CFrame * CFrame.new(0,FloatValue,0)
-                    else
-                        FloatingFunc:Disconnect()
-                        Float:Destroy()
-                        qUp:Disconnect()
-                        eUp:Disconnect()
-                        qDown:Disconnect()
-                        eDown:Disconnect()
-                        floatDied:Disconnect()
-                    end
-                end			
-                FloatingFunc = game:GetService('RunService').Heartbeat:Connect(FloatPadLoop)
-            end)
-        end
-        rconsoleprint("@@CYAN@@")
-        rconsoleprint("Float has been enabled, Q and E to go up and down.\n")
-        rconsoleprint("@@WHITE@@")
-    elseif str:lower() == "unfloat" then
-        if plrw:FindFirstChild("oogeABAOGAGOBAOGOAG") then
-            plrw:FindFirstChild("oogeABAOGAGOBAOGOAG"):Destroy()
-        end
-        if floatDied then
-            FloatingFunc:Disconnect()
-            qUp:Disconnect()
-            eUp:Disconnect()
-            qDown:Disconnect()
-            eDown:Disconnect()
-            floatDied:Disconnect()
-        end 
-        rconsoleprint("@@CYAN@@")
-        rconsoleprint("Float has been disabled.\n")
-        rconsoleprint("@@WHITE@@")
-    elseif str:lower() == "esp" then
-        ESPToggle = not ESPToggle
-        ESP:Toggle(ESPToggle)
-        rconsoleprint("@@CYAN@@")
-        rconsoleprint("ESP has been set to "..tostring(ESPToggle).."\n")
-        rconsoleprint("@@WHITE@@")
-    elseif str:lower() == "chams" then
-        chams = not chams
-        if chams then
-            for _, Player in next, game:GetService("Players"):GetChildren() do
-                ApplyModel(Player) wait()
-            end
-            for i,v in pairs(game:GetService("Players"):GetChildren()) do
-                CharacterAddedConnection = v.CharacterAdded:Connect(function(character)
-                    ApplyPlayer(character)
-                end)
-            end
-            rconsoleprint("@@CYAN@@")
-            rconsoleprint("Chams has been enabled.\n")
-            rconsoleprint("@@WHITE@@")
-        else
-            for _, Player in next, plrs:GetChildren() do
-                if Player.Character:FindFirstChild("Highlight") then
-                    Player.Character:FindFirstChild("Highlight"):Destroy()
                 end
-            end
-            for i,v in pairs(workspace:GetDescendants()) do
-                if table.find(plrtable, v.Name) then
-                    if v:FindFirstChild("Highlight") then v:FindFirstChild("Highlight"):Destroy() end
-                end
-            end
-            CharacterAddedConnection:Disconnect()
-            rconsoleprint("@@CYAN@@")
-            rconsoleprint("Chams has been disabled.\n")
-            rconsoleprint("@@WHITE@@")
-        end
+            end			
+            FloatingFunc = game:GetService('RunService').Heartbeat:Connect(FloatPadLoop)
+        end)
+    end
+    rconsoleprint("@@CYAN@@")
+    rconsoleprint("Float has been enabled, Q and E to go up and down.\n")
+    rconsoleprint("@@WHITE@@")
+end)
+AddCmd("unfloat", "noplatform", function()
+    if plrw:FindFirstChild("oogeABAOGAGOBAOGOAG") then
+        plrw:FindFirstChild("oogeABAOGAGOBAOGOAG"):Destroy()
+    end
+    if floatDied then
+        FloatingFunc:Disconnect()
+        qUp:Disconnect()
+        eUp:Disconnect()
+        qDown:Disconnect()
+        eDown:Disconnect()
+        floatDied:Disconnect()
+    end 
+    rconsoleprint("@@CYAN@@")
+    rconsoleprint("Float has been disabled.\n")
+    rconsoleprint("@@WHITE@@")
+end)
+AddCmd("esp", nil, function()
+    ESPToggle = not ESPToggle
+    ESP:Toggle(ESPToggle)
+    rconsoleprint("@@CYAN@@")
+    rconsoleprint("ESP has been set to "..tostring(ESPToggle).."\n")
+    rconsoleprint("@@WHITE@@")
+end)
+AddCmd("goto", "to", function(str)
+    FoundPlayer = FindName(str)
+    if FoundPlayer then
+        rconsoleprint("teleporting to "..FoundPlayer.."\n")
+        plrhrp.CFrame = workspace:FindFirstChild(FoundPlayer):FindFirstChild("HumanoidRootPart").CFrame
+        rconsoleprint("teleported to "..FoundPlayer.."\n")
     else
         rconsoleprint("@@RED@@")
-        rconsoleprint("<ERROR> Couldn't find command "..str..", are you sure you typed the command correctly?\n")
+        rconsoleprint("<ERROR> Couldn't find a player whose name started with "..str..".\n")
         rconsoleprint("@@WHITE@@")
     end
+end)
+AddCmd("noclip", "nc", function()
+    Clip = false
+    Noclipping = game:GetService('RunService').Stepped:Connect(NoclipLoop)
+    rconsoleprint("@@CYAN@@")
+    rconsoleprint("<INFO> Noclip enabled.\n")
+    rconsoleprint("@@WHITE@@")
+end)
+AddCmd("clip", "c", function()
+    Clip = true
+    Noclipping:Disconnect()
+    rconsoleprint("@@CYAN@@")
+    rconsoleprint("<INFO> Noclip disabled.\n")
+    rconsoleprint("@@WHITE@@")
+end)
+AddCmd("setjp", "jp", function(arg)
+    if arg ~= nil then
+        rconsoleprint("setting jump power to "..arg.."\n")
+        game:GetService("Players").LocalPlayer.Character.Humanoid.JumpPower = tonumber(str)
+        wait(.25)
+        rconsoleprint("jump power has been set to "..arg.."\n")
+    end
+end)
+
+ListCommands()
+
+while true do
+    rconsoleprint(">")
+    local str = AwaitConsoleInput()
+    local FoundCommand = false
+    for i,v in pairs(cmdtable) do
+        strtocompare = string.split(str, " ")
+        str = strtocompare[1]
+        if #strtocompare >= 2 then
+            arg = strtocompare[2]
+        end
+        if table.find(v.names, str) then
+            FoundCommand = true
+            v.callback(arg)
+        end
+    end
+    if not FoundCommand then
+        SendError("Failed to find command " .. str .. "!\n")
+    end
 end
+
