@@ -127,7 +127,7 @@ while true do
         wait(.25)
         rconsoleprint("walkspeed has been set to "..str.."\n")
     elseif str:lower() == "cmds" then
-        rconsoleinfo("Commands are:\nclr (Clears console)\nsetwalkspeed [speed]\nsetjumppower [jumppower]\nnoclip\nclip\ntp/to [player]\nfloat\nunfloat\nesp\nchams\n\nEnter a command:\n")
+        ListCommands()
     elseif str:lower() == "break" then
         rconsoleclear()
         rconsoleprint("broken while true do chain")
