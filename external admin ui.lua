@@ -26,6 +26,24 @@ plr.CharacterAdded:Connect(function(nchar)
     plrw = nchar
     plrh = plrw.Humanoid
 end)
+if game.PlaceId == 6456351776 then
+    for i, connection in pairs(getconnections(game.Players.LocalPlayer.Character.Humanoid.Changed)) do
+        connection:Disable()
+    end
+    
+    
+    plr.CharacterAdded:Connect(function()
+    
+        task.wait(.5)
+    
+        if plrhumanoid ~= nil then
+            for _, conn in next, getconnections(plrhumanoid.Changed) do
+                conn:Disable()
+            end
+        end
+    
+    end)
+end
 local ESPToggle = false
 local ESP = loadstring(game:HttpGet("https://raw.githubusercontent.com/Kiriot22/ESP-Lib/main/ESP.lua"))()
 
