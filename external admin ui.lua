@@ -44,6 +44,7 @@ if game.PlaceId == 6456351776 then
     
     end)
 end
+
 local ESPToggle = false
 local ESP = loadstring(game:HttpGet("https://raw.githubusercontent.com/Kiriot22/ESP-Lib/main/ESP.lua"))()
 
@@ -177,10 +178,10 @@ AddCmd("chams", nil, function()
                 ApplyPlayer(character)
             end)
         end
-        rconsoleprint("@@CYAN@@")
+        SetCyan()
         rconsoleprint("Chams has been enabled.\n")
-        rconsoleprint("Chams is fairly buggy.")
-        rconsoleprint("@@WHITE@@")
+        rconsoleprint("Chams is fairly buggy.\n")
+        SetWhite()
     else
         for _, Player in next, plrs:GetChildren() do
             if Player.Character:FindFirstChild("Highlight") then
@@ -193,15 +194,15 @@ AddCmd("chams", nil, function()
             end
         end
         CharacterAddedConnection:Disconnect()
-        rconsoleprint("@@CYAN@@")
+        SetCyan()
         rconsoleprint("Chams has been disabled.\n")
-        rconsoleprint("Chams is fairly buggy, expect highlights to stay sometimes")
-        rconsoleprint("@@WHITE@@")
+        rconsoleprint("Chams is fairly buggy, expect highlights to stay sometimes.\n")
+        SetWhite()
     end
 end)
 
 local function ListCommands()
-    rconsoleprint("@@CYAN@@")
+    SetCyan()
     rconsoleprint("Commands are:\n")
     for i,v in pairs(cmdtable) do
         if v.names[1] and v.names[2] then
@@ -210,9 +211,9 @@ local function ListCommands()
             rconsoleprint(""..v.names[1].."\n")
         end
     end
-    rconsoleprint("@@MAGENTA@@")
+    SetPurple()
     rconsoleprint("\n\nEnter a command:\n\n")
-    rconsoleprint("@@WHITE@@")
+    SetWhite()
 end
 
 AddCmd("clr", "clrlogs", function()
@@ -275,9 +276,9 @@ AddCmd("float", "platform", function()
             FloatingFunc = game:GetService('RunService').Heartbeat:Connect(FloatPadLoop)
         end)
     end
-    rconsoleprint("@@CYAN@@")
+    SetCyan()
     rconsoleprint("Float has been enabled, Q and E to go up and down.\n")
-    rconsoleprint("@@WHITE@@")
+    SetWhite()
 end)
 AddCmd("unfloat", "noplatform", function()
     if plrw:FindFirstChild("oogeABAOGAGOBAOGOAG") then
@@ -291,56 +292,62 @@ AddCmd("unfloat", "noplatform", function()
         eDown:Disconnect()
         floatDied:Disconnect()
     end 
-    rconsoleprint("@@CYAN@@")
+    SetCyan()
     rconsoleprint("Float has been disabled.\n")
-    rconsoleprint("@@WHITE@@")
+    SetWhite()
 end)
 AddCmd("esp", nil, function()
     ESPToggle = not ESPToggle
     ESP:Toggle(ESPToggle)
-    rconsoleprint("@@CYAN@@")
+    SetCyan()
     rconsoleprint("ESP has been set to "..tostring(ESPToggle).."\n")
-    rconsoleprint("@@WHITE@@")
+    SetWhite()
 end)
 AddCmd("goto", "to", function(str)
     FoundPlayer = FindName(str)
     if FoundPlayer then
+        SetCyan()
         rconsoleprint("teleporting to "..FoundPlayer.."\n")
         plrhrp.CFrame = workspace:FindFirstChild(FoundPlayer):FindFirstChild("HumanoidRootPart").CFrame
         rconsoleprint("teleported to "..FoundPlayer.."\n")
+        SetWhite()
     else
-        rconsoleprint("@@RED@@")
+        SetRed()
         rconsoleprint("<ERROR> Couldn't find a player whose name started with "..str..".\n")
-        rconsoleprint("@@WHITE@@")
+        SetWhite()
     end
 end)
 AddCmd("noclip", "nc", function()
     Clip = false
     Noclipping = game:GetService('RunService').Stepped:Connect(NoclipLoop)
-    rconsoleprint("@@CYAN@@")
+    SetCyan()
     rconsoleprint("<INFO> Noclip enabled.\n")
-    rconsoleprint("@@WHITE@@")
+    SetWhite()
 end)
 AddCmd("clip", "c", function()
     Clip = true
     Noclipping:Disconnect()
-    rconsoleprint("@@CYAN@@")
+    SetCyan()
     rconsoleprint("<INFO> Noclip disabled.\n")
-    rconsoleprint("@@WHITE@@")
+    SetWhite()
 end)
 AddCmd("setjp", "jp", function(arg)
     if arg ~= nil then
+        SetCyan()
         rconsoleprint("setting jump power to "..arg.."\n")
         game:GetService("Players").LocalPlayer.Character.Humanoid.JumpPower = tonumber(str)
         wait(.25)
         rconsoleprint("jump power has been set to "..arg.."\n")
+        SetWhite()
     end
 end)
 
 ListCommands()
 
 while true do
+    SetPurple()
     rconsoleprint(">")
+    SetWhite()
     local str = AwaitConsoleInput()
     local FoundCommand = false
     for i,v in pairs(cmdtable) do
@@ -358,4 +365,5 @@ while true do
         SendError("Failed to find command " .. str .. "!\n")
     end
 end
+
 
