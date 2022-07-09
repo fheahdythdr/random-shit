@@ -12,6 +12,8 @@ export async function main(ns) {
 	else {
 		ram = args._[1]
 	}
-
-	ns.purchaseServer(name, ram)
+	let yesno = await ns.prompt('do you want to buy server with name "'+name+'" and '+ram+'gb ram?')
+	if (yesno){
+		ns.purchaseServer(name, ram)
+	}
 }
