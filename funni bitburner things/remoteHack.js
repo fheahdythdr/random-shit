@@ -2,10 +2,20 @@
 export async function main(ns) {
 	const args = ns.flags([["help", false]]);
 	const host = args._[0];
-	await ns.brutessh(host)
-	await ns.sqlinject(host)
-	await ns.ftpcrack(host)
-	await ns.httpworm(host)
-	await ns.relaysmtp(host)
-	await ns.nuke(host)
+	if (ns.fileExists("BruteSSH.exe", "home")) {
+		ns.brutessh(host);
+	}
+	if (ns.fileExists("SQLInject.exe", "home")) {
+		ns.sqlinject(host);
+	}
+	if (ns.fileExists("FTPCrack.exe", "home")) {
+		ns.ftpcrack(host);
+	}
+	if (ns.fileExists("HTTPWorm.exe", "home")) {
+		ns.httpworm(host);
+	}
+	if (ns.fileExists("relaySMTP.exe", "home")) {
+		ns.relaysmtp(host);
+	}
+	ns.nuke(host);
 }
