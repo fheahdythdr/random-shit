@@ -3,5 +3,5 @@ export async function main(ns) {
 	const files = ns.ls(ns.getHostname(), ".lit")
 	const dest = "home"
 	await ns.scp(files, dest)
-	ns.tprint(`transferred ${files} to home`)
+	return ns.tprint(`transferred ${files} to home`)
 }
