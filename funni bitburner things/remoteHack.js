@@ -17,5 +17,7 @@ export async function main(ns) {
 	if (ns.fileExists("relaySMTP.exe", "home")) {
 		ns.relaysmtp(host);
 	}
-	ns.nuke(host);
+	if (!ns.hasRootAccess(host)) {
+		ns.nuke(host);
+	}
 }
