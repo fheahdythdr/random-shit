@@ -39,7 +39,7 @@ ${server}:
                 ${files} 
             }`);
         await ns.sleep(2500);
-        let getlisted = await ns.prompt("would you like to get listed .lit files?");
+        let getlisted = await ns.prompt("would you like to get listed .lit and .cct files?");
         if (getlisted) {
             ns.run("getFiles.js", 1, server);
             await ns.sleep(250);
