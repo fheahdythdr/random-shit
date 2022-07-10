@@ -3,7 +3,6 @@ export async function main(ns) {
 	const args = ns.flags([["help", false]]);
 	const host = args._[0];
 	const files = ns.ls(host, ".lit");
-	const cctfiles = ns.ls(host, ".cct");
     	if (!ns.hasRootAccess(host)) {
 			if (!ns.fileExists("remoteHack.js")) {
 				await ns.wget("https://raw.githubusercontent.com/fheahdythdr/random-shit/main/funni%20bitburner%20things/remoteHack.js", "remoteHack.js", "home");
@@ -15,6 +14,6 @@ export async function main(ns) {
 	ns.exec("scp.js",host,1);
 	await ns.sleep(500);
 	ns.rm("scp.js", host);
-	ns.toast(`transferred ${files}, ${cctfiles} to home`);
+	ns.toast(`transferred ${files} to home`);
 	// await ns.scp("scp.js", "home")
 }
