@@ -43,6 +43,12 @@ ${server}:
             if (!ns.fileExists("getFiles.js")) {
                 await ns.wget("https://raw.githubusercontent.com/fheahdythdr/random-shit/main/funni%20bitburner%20things/getFiles.js", "getFiles.js");
             }
+            if (!ns.hasRootAccess(server)) {
+                if (!ns.fileExists("remoteHack.js")) {
+                await ns.wget("https://raw.githubusercontent.com/fheahdythdr/random-shit/main/funni%20bitburner%20things/remoteHack.js", "remoteHack.js");
+                }
+                ns.run("remoteHack.js", 1, server);
+            }
             ns.run("getFiles.js", 1, server);
         }
     }
