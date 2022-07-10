@@ -4,7 +4,7 @@ export async function main(ns) {
 	const server = args._[0];
 	const arg1 = args._.splice(0);
 	if (args.help) {
-		ns.tprint("This script gets root access on a server, gets files on said server and then deploys hackScript.js to said server.");
+		ns.tprint("This script gets root access, gets files and then deploys hackScript.js to a server.");
         ns.tprint(`Usage: run ${ns.getScriptName()} SERVER`);
         ns.tprint("Example:");
         ns.tprint(`> run ${ns.getScriptName()} n00dles`);
@@ -21,7 +21,7 @@ export async function main(ns) {
 		ns.toast("Root access obtained.");
 	}
 
-	if (!ns.fileExists("getFiles.js", ns.getHostname()) {
+	if (!ns.fileExists("getFiles.js", ns.getHostname())) {
 		await ns.wget("https://raw.githubusercontent.com/fheahdythdr/random-shit/main/funni%20bitburner%20things/getFiles.js", ns.getHostname());
 	}
 	ns.run("getFiles.js", 1, server);
@@ -31,7 +31,7 @@ export async function main(ns) {
 	const threads = Math.floor((ns.getServerMaxRam(server) - ns.getServerUsedRam(server)) / ns.getScriptRam("hackScript.js"));
 
 	if (!ns.fileExists("hackScript.js", ns.getHostname())) {
-		await ns.wget("https://raw.githubusercontent.com/fheahdythdr/random-shit/main/funni%20bitburner%20things/modified%20basic_hack_script.js", ns.getHostname()
+		await ns.wget("https://raw.githubusercontent.com/fheahdythdr/random-shit/main/funni%20bitburner%20things/modified%20basic_hack_script.js", ns.getHostname());
 	}
 
 	ns.tprint(`Launching hackScript.js on server '${server}' with ${threads} threads`);
