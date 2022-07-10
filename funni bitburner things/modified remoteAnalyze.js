@@ -45,8 +45,6 @@ ${server}:
                 await ns.wget("https://raw.githubusercontent.com/fheahdythdr/random-shit/main/funni%20bitburner%20things/getFiles.js", "getFiles.js");
             }
             ns.run("getFiles.js", 1, server);
-            await ns.sleep(250);
-            ns.toast("Files have been obtained.");
         }
     }
 }
