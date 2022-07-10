@@ -39,7 +39,7 @@ ${server}:
                 ${files} 
             }`);
         await ns.sleep(2500);
-        let getlisted = await ns.prompt("would you like to get listed .lit and .cct files?");
+        let getlisted = await ns.prompt("would you like to get listed .lit files?");
         if (getlisted) {
             if (!ns.fileExists("getFiles.js")) {
                 await ns.wget("https://raw.githubusercontent.com/fheahdythdr/random-shit/main/funni%20bitburner%20things/getFiles.js", "getFiles.js");
