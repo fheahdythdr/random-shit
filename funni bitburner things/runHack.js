@@ -4,7 +4,7 @@ export async function main(ns) {
 	const server = args._[0];
 	const arg1 = args._.splice(0);
 	if (args.help) {
-		ns.tprint("This script gets root access, gets files and then deploys hackScript.js to a server.");
+		ns.tprint("This script gets root access on a server, gets files on said server and then deploys hackScript.js to said server.");
         ns.tprint(`Usage: run ${ns.getScriptName()} SERVER`);
         ns.tprint("Example:");
         ns.tprint(`> run ${ns.getScriptName()} n00dles`);
