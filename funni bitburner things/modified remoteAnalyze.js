@@ -38,7 +38,7 @@ ${server}:
             {
                 ${files} 
             }`);
-        await ns.sleep(2500);
+        await ns.sleep(1250);
         let getlisted = await ns.prompt("would you like to get listed .lit files?");
         if (getlisted) {
             if (!ns.fileExists("getFiles.js")) {
