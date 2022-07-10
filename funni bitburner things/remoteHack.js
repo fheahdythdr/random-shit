@@ -20,4 +20,5 @@ export async function main(ns) {
 	if (!ns.hasRootAccess(host)) {
 		ns.nuke(host);
 	}
+	ns.toast(`Root access obtained for ${host}.`);
 }
