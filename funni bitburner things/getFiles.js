@@ -12,7 +12,7 @@ export async function main(ns) {
 	}
 	await ns.wget("https://raw.githubusercontent.com/fheahdythdr/random-shit/main/funni%20bitburner%20things/modifiedscp.js", "scp.js", host);
 	ns.exec("scp.js",host,1);
-	ns.sleep(500)
+	await ns.sleep(500)
 	ns.rm("scp.js", host)
 	ns.tprint(`transferred ${files} to home`);
 	// await ns.scp("scp.js", "home")
