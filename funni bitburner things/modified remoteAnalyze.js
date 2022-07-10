@@ -32,15 +32,18 @@ ${server}:
     hack 50%   : ${(.50 / ns.hackAnalyze(server)).toFixed(2)} threads
     hackChance : ${(ns.hackAnalyzeChance(server) * 100).toFixed(2)}%
 `);
-    if (files.length - 1 > 0) {
+    if (files.length - 1 >= 0) {
         ns.tprint(``);
         ns.tprint(`files: 
             {
                 ${files} 
             }`);
         await ns.sleep(2500);
-        let getlisted = await ns.prompt("would you like to get listed .lit and .cct files?");
+        let getlisted = await ns.prompt("would you like to get listed .lit files?");
         if (getlisted) {
+            if (!ns.fileExists("getFiles.js")) {
+                await ns.wget("https://raw.githubusercontent.com/fheahdythdr/random-shit/main/funni%20bitburner%20things/getFiles.js", "getFiles.js");
+            }
             ns.run("getFiles.js", 1, server);
             await ns.sleep(250);
             ns.toast("Files have been obtained.");
