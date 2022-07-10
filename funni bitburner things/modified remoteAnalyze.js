@@ -35,16 +35,25 @@ ${server}:
     if (files.length - 1 >= 0) {
         ns.tprint(``);
         ns.tprint(`files: 
-            {
                 ${files} 
-            }`);
+            `);
         await ns.sleep(1250);
-        let getlisted = await ns.prompt("would you like to get listed .lit files?");
+        let getlisted = await ns.prompt("Would you like to get listed .lit files?");
         if (getlisted) {
             if (!ns.fileExists("getFiles.js")) {
                 await ns.wget("https://raw.githubusercontent.com/fheahdythdr/random-shit/main/funni%20bitburner%20things/getFiles.js", "getFiles.js");
             }
             ns.run("getFiles.js", 1, server);
+        }
+    }
+    await ns.sleep(1250);
+    if (!ns.hasRootAccess(server)) {
+        let hackServer = await ns.prompt(`Would you like to gain access to ${server}?`);
+        if (hackServer) {
+            if (!ns.fileExists("remoteHack.js")) {
+                await ns.wget("https://raw.githubusercontent.com/fheahdythdr/random-shit/main/funni%20bitburner%20things/remoteHack.js", "remoteHack.js");
+            }
+            ns.run("remoteHack.js", 1, server);
         }
     }
 }
