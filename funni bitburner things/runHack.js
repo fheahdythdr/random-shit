@@ -11,7 +11,7 @@ export async function main(ns) {
         return;
 	}
 	if (!ns.hasRootAccess(server)) {
-		ns.toast("No root access, running remote hack.", "info");
+		ns.toast("No root access, running remote hack.", "warning");
 		await ns.sleep(500);
 		if (!ns.fileExists("remoteHack.js", ns.getHostname())) {
 			await ns.wget("https://raw.githubusercontent.com/fheahdythdr/random-shit/main/funni%20bitburner%20things/remoteHack.js", ns.getHostname());
