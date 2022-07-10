@@ -3,7 +3,7 @@ export async function main(ns) {
 	const args = ns.flags([["help", false]])
 	const server = args._[0];
 	const arg1 = args._.splice(0);
-	if (args.help) {
+	if (args.help || !server) {
 		ns.tprint("This script gets root access, gets files and then deploys hackScript.js to a server.");
         ns.tprint(`Usage: run ${ns.getScriptName()} SERVER`);
         ns.tprint("Example:");
