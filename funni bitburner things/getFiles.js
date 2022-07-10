@@ -15,6 +15,6 @@ export async function main(ns) {
 	ns.exec("scp.js",host,1);
 	await ns.sleep(500);
 	ns.rm("scp.js", host);
-	ns.toast(`transferred ${files + cctfiles} to home`);
+	ns.toast(`transferred ${files}, ${cctfiles} to home`);
 	// await ns.scp("scp.js", "home")
 }
