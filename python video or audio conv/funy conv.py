@@ -1,3 +1,5 @@
+# yeah its shit but fuck it
+
 from genericpath import isfile
 import os
 dir_path = os.path.dirname(os.path.realpath(__file__))
