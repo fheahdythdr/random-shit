@@ -46,25 +46,41 @@ if is_admin():
             newSound = soundfile
         copyfile(dir + "/sound/" + newSound, fileDest + "/ouch.ogg")
     elif file_type == "cursor":
+        count = os.listdir(dir + "/cursors")
+        totalcount = 0
         if len(sys.argv) == 3:
             if sys.argv[2] == "-m":
                 print("select cursor files, order: \nfirst file: arrowcursor,\nsecond file: arrowfarcursor")
         else:
             print("select cursor file")
         for file in libs.getListOfFiles(dir + "/cursors"):
-            print(file.split("/")[len(file.split("/")) - 1].split("\\")[1])
+            print(file.split("/")[len(file.split("/")) - 1].split("\\")[1] + "  List Number: " + str(totalcount + 1))
+            totalcount += 1
         if len(sys.argv) == 3:
             if sys.argv[2] == "-m":
                 option1 = input()
                 option2 = input()
+                try:
+                    currentNum1 = int(option1) - 1
+                    newOpt1 = count[currentNum1]
+                    currentNum2 = int(option2) - 1
+                    newOpt2 = count[currentNum2]
+                except:
+                    newOpt1 = option1
+                    newOpt2 = option2
         else:
             option = input()
+            try:
+                currentNum = int(option) - 1
+                newOpt = count[currentNum]
+            except:
+                newOpt = option
         if len(sys.argv) == 3:
             if sys.argv[2] == "-m":
-                copyfile(dir + "/cursors/" + option1, fileDest + "/ArrowCursor.png")
-                copyfile(dir + "/cursors/" + option2, fileDest + "/ArrowFarCursor.png")
+                copyfile(dir + "/cursors/" + newOpt1, fileDest + "/ArrowCursor.png")
+                copyfile(dir + "/cursors/" + newOpt2, fileDest + "/ArrowFarCursor.png")
         else:
-            copyfile(dir + "/cursors/" + option, fileDest + "/ArrowCursor.png")
-            copyfile(dir + "/cursors/" + option, fileDest + "/ArrowFarCursor.png")
+            copyfile(dir + "/cursors/" + newOpt, fileDest + "/ArrowCursor.png")
+            copyfile(dir + "/cursors/" + newOpt, fileDest + "/ArrowFarCursor.png")
 else:
     ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, __file__, None, 1)
