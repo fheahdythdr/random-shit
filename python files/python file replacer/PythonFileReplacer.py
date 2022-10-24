@@ -1,6 +1,5 @@
 import os, ctypes, sys
 from shutil import copyfile
-import pylibs.directorycustom as libs
 try:
     if sys.argv[1] == "--clog":
         print("Rewrote in Python.")
@@ -26,16 +25,66 @@ def is_admin():
         return ctypes.windll.shell32.IsUserAnAdmin()
     except:
         return False
+    
+try:
+    PATH = open(os.path.dirname(os.path.realpath(__file__))   + "/PATH.txt", "r").read()
+except:
+    print("No PATH detected, please go find your Roblox cursor and sound files, then set it to the parent folder of Versions.")
+    path = input()
+    PATH = open(os.path.dirname(os.path.realpath(__file__))   + "/PATH.txt", "x")
+    PATH.write(path)
+    PATH.close()
+    PATH = open(os.path.dirname(os.path.realpath(__file__))   + "/PATH.txt", "r").read()
+    
+def getListOfFiles(dirName):
+    # create a list of file and sub directories 
+    # names in the given directory 
+    listOfFile = os.listdir(dirName)
+    allFiles = list()
+    # Iterate over all the entries
+    for entry in listOfFile:
+        # Create full path
+        fullPath = os.path.join(dirName, entry)
+        os.path.isdir
+        # If entry is a directory then get the list of files in this directory 
+        if os.path.isdir(fullPath):
+            allFiles = allFiles + getListOfFiles(fullPath)
+        else:
+            allFiles.append(fullPath)
+
+    return allFiles
+    
+def get_files(type):
+    if type == "cursor":
+        files = list()
+        for file in os.listdir(PATH):
+            if file.find("version-") != -1:
+                cursorDest = PATH + "/" + "/content/textures/Cursors/KeyboardMouse"
+                files.append(cursorDest + "/ArrowCursor.png")
+                files.append(cursorDest + "/ArrowFarCursor.png")
+        return files, cursorDest
+    elif type == "sound":
+        files = list()
+        for file in os.listdir(PATH):
+            if file.find("version-") != -1:
+                fileDest = PATH + "/" + file + "/content/sounds"
+                files.append(fileDest + "/ouch.ogg")
+        return files, fileDest
+    else:
+        print("Invalid type.")
+    
+user = os.getenv("USERNAME")
 
 if is_admin():
     dir = os.path.dirname(os.path.realpath(__file__))  
     file_type = sys.argv[1]
-    files, fileDest = libs.get_files(file_type)
+    files, fileDest = get_files(file_type)
+        
     if file_type == "sound":
         print("select sound file:\n")
         count = os.listdir(dir + "/sound")
         totalcount = 0
-        for file in libs.getListOfFiles(dir + "/sound"):
+        for file in getListOfFiles(dir + "/sound"):
             print(file.split("/")[len(file.split("/")) - 1].split("\\")[1] + "  List Number: " + str((totalcount)+ 1))
             totalcount += 1
         soundfile = input()
@@ -53,7 +102,7 @@ if is_admin():
                 print("select cursor files, order: \nfirst file: arrowcursor,\nsecond file: arrowfarcursor\n")
         else:
             print("select cursor file\n")
-        for file in libs.getListOfFiles(dir + "/cursors"):
+        for file in getListOfFiles(dir + "/cursors"):
             print(file.split("/")[len(file.split("/")) - 1].split("\\")[1] + "  List Number: " + str(totalcount + 1))
             totalcount += 1
         if len(sys.argv) == 3:
