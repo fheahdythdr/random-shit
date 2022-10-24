@@ -50,9 +50,9 @@ if is_admin():
         totalcount = 0
         if len(sys.argv) == 3:
             if sys.argv[2] == "-m":
-                print("select cursor files, order: \nfirst file: arrowcursor,\nsecond file: arrowfarcursor")
+                print("select cursor files, order: \nfirst file: arrowcursor,\nsecond file: arrowfarcursor\n")
         else:
-            print("select cursor file")
+            print("select cursor file\n")
         for file in libs.getListOfFiles(dir + "/cursors"):
             print(file.split("/")[len(file.split("/")) - 1].split("\\")[1] + "  List Number: " + str(totalcount + 1))
             totalcount += 1
@@ -84,3 +84,4 @@ if is_admin():
             copyfile(dir + "/cursors/" + newOpt, fileDest + "/ArrowFarCursor.png")
 else:
     ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, __file__, None, 1)
+
