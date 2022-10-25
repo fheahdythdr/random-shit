@@ -1,6 +1,15 @@
-import os, ctypes, sys, ffmpeg
+import os, ctypes, sys, ffmpeg, PIL
+from PIL import Image
+from genericpath import isdir
 from shutil import copyfile
+dir = os.path.dirname(os.path.realpath(__file__))  
 EXIT = False
+if not isdir(dir + "/batch"):
+    os.mkdir(dir + "/batch")
+if not isdir(dir + "/cursors"):
+    os.mkdir(dir + "/cursors")
+if not isdir(dir + "/sound"):
+    os.mkdir(dir + "/sound")
 try:
     if sys.argv[1] == "--clog":
         print("Change 1: Rewrote in Python.\n ")
@@ -67,7 +76,7 @@ else:
             files = list()
             for file in os.listdir(PATH):
                 if file.find("version-") != -1:
-                    cursorDest = PATH + "/" + "/content/textures/Cursors/KeyboardMouse"
+                    cursorDest = PATH + "/" + file + "/content/textures/Cursors/KeyboardMouse"
                     files.append(cursorDest + "/ArrowCursor.png")
                     files.append(cursorDest + "/ArrowFarCursor.png")
             return files, cursorDest
@@ -134,10 +143,26 @@ else:
                 if len(sys.argv) == 3:
                     if sys.argv[2] == "-m":
                         copyfile(dir + "/cursors/" + newOpt1, fileDest + "/ArrowCursor.png")
+                        resizingImage = Image.open(fileDest + "/ArrowCursor.png")
+                        if resizingImage.size != (64, 64):
+                            resizedImage = resizingImage.resize((64, 64))
+                            resizedImage.save(fileDest + "/ArrowCursor.png")
                         copyfile(dir + "/cursors/" + newOpt2, fileDest + "/ArrowFarCursor.png")
+                        resizingImage2 = Image.open(fileDest + "/ArrowFarCursor.png")
+                        if resizingImage2.size != (64, 64):
+                            resizedImage2 = resizingImage2.resize((64, 64))
+                            resizedImage2.save(fileDest + "/ArrowFarCursor.png")
                 else:
                     copyfile(dir + "/cursors/" + newOpt, fileDest + "/ArrowCursor.png")
-                    copyfile(dir + "/cursors/" + newOpt, fileDest + "/ArrowFarCursor.png")
+                    resizingImage = Image.open(fileDest + "/ArrowCursor.png")
+                    if resizingImage.size != (64, 64):
+                        resizedImage = resizingImage.resize((64, 64))
+                        resizedImage.save(fileDest + "/ArrowCursor.png")
+                    copyfile(dir + "/cursors/" + newOpt, fileDest + "/ArrowFarCursor.png")                    
+                    resizingImage2 = Image.open(fileDest + "/ArrowFarCursor.png")
+                    if resizingImage2.size != (64, 64):
+                        resizedImage2 = resizingImage2.resize((64, 64))
+                        resizedImage2.save(fileDest + "/ArrowFarCursor.png")
         else:
             choice = input('do you want to convert every file in the batch folder, or just one? (y/n): \n')
             if choice == "y":
@@ -166,4 +191,4 @@ else:
                     ffmpeg.run(stream)
     else:
         dir = os.path.dirname(os.path.realpath(__file__))  
-        ctypes.windll.shell32.ShellExecuteW(None, "runas", "cmd", "py " + __file__, None, 1)
+        ctypes.windll.shell32.ShellExecuteW(None, "runas", "cmd", "", None, 1)
