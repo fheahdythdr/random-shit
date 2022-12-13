@@ -4,40 +4,62 @@ const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout,
 })
+const ffmpegstatic = require('ffmpeg-static').default
+const ffmpeg = require("fluent-ffmpeg")
+const nodew = require('node-windows')
+ffmpeg.setFfmpegPath(ffmpegstatic)
 
-function input() {
-    rl.question("Where is Astroneer located? (ex. F:\\SteamLibrary\\steamapps\\common\\ASTRONEER)\n\n", (path) => {
-        if (fs.existsSync(path)) fs.writeFileSync(__dirname + "/astropath.txt", path)
+async function input() {
+    rl.question("Where is Astroneer located? (ex. F:\\SteamLibrary\\steamapps\\common\\ASTRONEER)\n\n", async (path) => {
+        if (fs.existsSync(path)) {
+            fs.writeFileSync(__dirname + "/astropath.txt", path)
+            await replace();
+        }
         else {
             console.log("Invalid path.\n")
-            input();
+            await input();
         }
     })
 }
 
-if (!fs.existsSync(__dirname + "/astropath.txt")) {
-    console.log("No astropath.txt, input astroneer path.\n")
-    input();
+async function cv(file, noext) {
+    const cmd = ffmpeg({source: __dirname + "/conv/" + file})
+    cmd.output(__dirname + "/files/" + noext + '.mp4')
+    cmd.run();
+    return new Promise((resolve, reject) => {
+        cmd.on('end', () => {
+            resolve
+            fs.rmSync(__dirname + "/conv/" + file)
+            fs.rmdirSync(__dirname + "/conv/")
+        });
+        cmd.on('error', reject);
+    })
 }
-else {
+
+async function replace() {
     const path = fs.readFileSync(__dirname + "/astropath.txt", "utf8") + "/Astro/Content/"
-    const filestring = "Anomaly Movie, loading_screen, ComputerScreen, GateUnlock, Legal, LoadingLoop, SESLogo"
+    let xboxInstallation = false;
+    if (path.includes("WindowsApps")) {
+        xboxInstallation = true;
+        console.log("YOU MAY GET A LOT OF UAC PROMPTS IF YOUR PC HAS THEM ENABLED. ACCEPT THEM ALL SO THIS FILE CAN COPY FILES IN THE ASTRONEER INSTALLATION DIRECTORY.")
+    }
+    const filestring = "Anomaly Movie, loading_screen, ComputerScreen, GateUnlock, Legal, LoadingLoop, SESLogo (not case sensitive)"
     const validthings = {
-        "Anomaly Movie": "AnomolyMovie.mp4",
+        "anomaly movie": "AnomolyMovie.mp4",
         "loading_screen": "astroneer_loadingscreen.mp4",
-        "ComputerScreen": "ComputerScreenMovie.mp4",
-        "GateUnlock": "GateUnlockMovie.mp4",
-        "Legal": [
+        "computerscreen": "ComputerScreenMovie.mp4",
+        "gateunlock": "GateUnlockMovie.mp4",
+        "legal": [
             "Legal4K.mp4",
             "Legal1080p.mp4",
             "Legal1088.mp4"
         ],
-        "LoadingLoop": [
+        "loadingloop": [
             "LoadingLoop4k.mp4",
             "LoadingLoop1080P.mp4",
             "LoadingLoop1088.mp4"
         ],
-        "SESLogo": [
+        "seslogo": [
             "ses_logo.mp4",
             "SESLogo4K.mp4",
             "SESLogo1080p.mp4",
@@ -45,35 +67,56 @@ else {
         ]
     }
     rl.question(`Which file would you like to replace?\nFiles are: ${filestring}\n\n`, (awnser) => {
-        if (validthings[awnser] != undefined) {
-            const toReplace = validthings[awnser];
+        if (validthings[awnser.toLowerCase()] != undefined) {
+            const toReplace = validthings[awnser.toLowerCase()];
             let files;
             const fileArray = [];
             for (const file in fs.readdirSync(__dirname + "/files/")) {
                 const fileNum = parseInt(file) + 1
                 const file2 = fs.readdirSync(__dirname + "/files/")[file]
                 files += file2 + ' ' + fileNum + "\n"
-                console.log(file2)
                 fileArray.push(file2);
             }
             if (!fs.existsSync(path + "MoviesBackup")) {
-                fs.mkdirSync(path + "MoviesBackup");
-                fs.cpSync(path + "Movies", path + "MoviesBackup");
+                if (!xboxInstallation) {
+                    fs.mkdirSync(path + "MoviesBackup");
+                    for (const toBackup of fs.readdirSync(path + "Movies")) {
+                        fs.copyFileSync(path + "Movies/" + toBackup, path + "MoviesBackup" + toBackup)
+                    }
+                }
+                else {
+                    nodew.elevate(`MKDIR ${path}MoviesBackup`)
+                    for (const toBackup of fs.readdirSync(path + "Movies")) {
+                        nodew.elevate(`COPY ${path}Movies/${toBackup} ${path}MoviesBackup/${toBackup}`)
+                    }
+                }
             }
-            rl.question(`What file do you want to use? Files are: \n\n${files.replace("undefined", "")}\n\n`, (awnser) => {
+            if (files === undefined) {
+                console.log("No files found in " + __dirname + "\\files\\")
+                process.exit(1)
+            }
+            rl.question(`What file do you want to use? Files are: \n\n${files.replace("undefined", "")}\n\n`, async (awnser) => {
                 if (parseInt(awnser) != (undefined || null)) {
                     awnser = fileArray[parseInt(awnser) - 1]
                     console.log(awnser)
                 }
+                const extension = '.' + awnser.split(".")[awnser.split(".").length - 1]
+                if (extension != ".mp4") {
+                    fs.mkdirSync(__dirname + "/conv/");
+                    fs.copyFileSync(__dirname + "/files/" + awnser, __dirname + "/conv/" + awnser);
+                    await cv(awnser, awnser.replace(extension, ''));
+                }
                 if (fs.existsSync(__dirname + "/files/" + awnser)) {
                     if (typeof toReplace == 'object') {
                         for (const replace of toReplace) {
-                            fs.copyFileSync(__dirname + "/files/" + awnser, path + "Movies/" + replace)
+                            if (!xboxInstallation) fs.copyFileSync(__dirname + "/files/" + awnser, path + "Movies/" + replace)
+                            else nodew.elevate(`COPY ${__dirname}/files/${awnser} ${path}Movies/${replace}`)
                         }
                         process.exit(0)
                     }
                     else {
-                        fs.copyFileSync(__dirname + "/files/" + awnser, path + "Movies/" + toReplace)
+                        if (!xboxInstallation) fs.copyFileSync(__dirname + "/files/" + awnser, path + "Movies/" + toReplace)
+                        else nodew.elevate(`COPY ${__dirname}/files/${awnser} ${path}Movies/${toReplace}`)
                         process.exit(0)
                     }
                 }
@@ -85,3 +128,13 @@ else {
         }
     })
 }
+
+(async () => {
+    if (!fs.existsSync(__dirname + "/astropath.txt")) {
+        console.log("No astropath.txt, input astroneer path.\n")
+        await input();
+    }
+    else {
+        await replace();
+    }
+})()
