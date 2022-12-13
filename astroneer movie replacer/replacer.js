@@ -6,12 +6,18 @@ const rl = readline.createInterface({
 })
 const ffmpegstatic = require('ffmpeg-static').default
 const ffmpeg = require("fluent-ffmpeg")
-const nodew = require('node-windows')
 ffmpeg.setFfmpegPath(ffmpegstatic)
 
 async function input() {
     rl.question("Where is Astroneer located? (ex. F:\\SteamLibrary\\steamapps\\common\\ASTRONEER)\n\n", async (path) => {
         if (fs.existsSync(path)) {
+            if (path.includes("WindowsApps")) {
+                console.log("Xbox installations are not supported at this time.");
+                return setTimeout(() => {
+                    process.exit(0)
+                }, 2500)
+                
+            }
             fs.writeFileSync(__dirname + "/astropath.txt", path)
             await replace();
         }
@@ -38,11 +44,6 @@ async function cv(file, noext) {
 
 async function replace() {
     const path = fs.readFileSync(__dirname + "/astropath.txt", "utf8") + "/Astro/Content/"
-    let xboxInstallation = false;
-    if (path.includes("WindowsApps")) {
-        xboxInstallation = true;
-        console.log("YOU MAY GET A LOT OF UAC PROMPTS IF YOUR PC HAS THEM ENABLED. ACCEPT THEM ALL SO THIS FILE CAN COPY FILES IN THE ASTRONEER INSTALLATION DIRECTORY.")
-    }
     const filestring = "Anomaly Movie, loading_screen, ComputerScreen, GateUnlock, Legal, LoadingLoop, SESLogo (not case sensitive)"
     const validthings = {
         "anomaly movie": "AnomolyMovie.mp4",
@@ -78,17 +79,9 @@ async function replace() {
                 fileArray.push(file2);
             }
             if (!fs.existsSync(path + "MoviesBackup")) {
-                if (!xboxInstallation) {
-                    fs.mkdirSync(path + "MoviesBackup");
-                    for (const toBackup of fs.readdirSync(path + "Movies")) {
-                        fs.copyFileSync(path + "Movies/" + toBackup, path + "MoviesBackup" + toBackup)
-                    }
-                }
-                else {
-                    nodew.elevate(`MKDIR ${path}MoviesBackup`)
-                    for (const toBackup of fs.readdirSync(path + "Movies")) {
-                        nodew.elevate(`COPY ${path}Movies/${toBackup} ${path}MoviesBackup/${toBackup}`)
-                    }
+                fs.mkdirSync(path + "MoviesBackup");
+                for (const toBackup of fs.readdirSync(path + "Movies")) {
+                    fs.copyFileSync(path + "Movies/" + toBackup, path + "MoviesBackup" + toBackup)
                 }
             }
             if (files === undefined) {
@@ -109,14 +102,12 @@ async function replace() {
                 if (fs.existsSync(__dirname + "/files/" + awnser)) {
                     if (typeof toReplace == 'object') {
                         for (const replace of toReplace) {
-                            if (!xboxInstallation) fs.copyFileSync(__dirname + "/files/" + awnser, path + "Movies/" + replace)
-                            else nodew.elevate(`COPY ${__dirname}/files/${awnser} ${path}Movies/${replace}`)
+                            fs.copyFileSync(__dirname + "/files/" + awnser, path + "Movies/" + replace)
                         }
                         process.exit(0)
                     }
                     else {
-                        if (!xboxInstallation) fs.copyFileSync(__dirname + "/files/" + awnser, path + "Movies/" + toReplace)
-                        else nodew.elevate(`COPY ${__dirname}/files/${awnser} ${path}Movies/${toReplace}`)
+                        fs.copyFileSync(__dirname + "/files/" + awnser, path + "Movies/" + toReplace)
                         process.exit(0)
                     }
                 }
