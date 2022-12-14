@@ -4,7 +4,7 @@ const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout,
 })
-const ffmpegstatic = require('ffmpeg-static').default
+const ffmpegstatic = require('ffmpeg-static')
 const ffmpeg = require("fluent-ffmpeg")
 ffmpeg.setFfmpegPath(ffmpegstatic)
 
@@ -31,10 +31,19 @@ async function input() {
 async function cv(file, noext) {
     const cmd = ffmpeg({source: __dirname + "/conv/" + file})
     cmd.output(__dirname + "/files/" + noext + '.mp4')
+    cmd.on('progress', (progress) => {
+        process.stdout.clearLine(0);
+        process.stdout.cursorTo(0);
+        process.stdout.write(`Conversion progress: ${progress.percent.toString().substring(0, 6)}%`)
+    })
     cmd.run();
     return new Promise((resolve, reject) => {
         cmd.on('end', () => {
-            resolve
+            process.stdout.clearLine(0);
+            process.stdout.cursorTo(0);
+            process.stdout.write('Done converting.\n')
+            resolve(noext + '.mp4')
+            fs.rmSync(__dirname + '/files/' + file)
             fs.rmSync(__dirname + "/conv/" + file)
             fs.rmdirSync(__dirname + "/conv/")
         });
@@ -91,14 +100,18 @@ async function replace() {
             rl.question(`What file do you want to use? Files are: \n\n${files.replace("undefined", "")}\n\n`, async (awnser) => {
                 if (parseInt(awnser) != (undefined || null)) {
                     awnser = fileArray[parseInt(awnser) - 1]
-                    console.log(awnser)
+                    //console.log(awnser)
                 }
                 const extension = '.' + awnser.split(".")[awnser.split(".").length - 1]
                 if (extension != ".mp4") {
+                    process.stdout.clearLine(0);
+                    process.stdout.cursorTo(0);
+                    console.log("Converting to mp4.")
                     fs.mkdirSync(__dirname + "/conv/");
                     fs.copyFileSync(__dirname + "/files/" + awnser, __dirname + "/conv/" + awnser);
-                    await cv(awnser, awnser.replace(extension, ''));
+                    awnser = await cv(awnser, awnser.replace(extension, ''));
                 }
+                console.log(awnser)
                 if (fs.existsSync(__dirname + "/files/" + awnser)) {
                     if (typeof toReplace == 'object') {
                         for (const replace of toReplace) {
