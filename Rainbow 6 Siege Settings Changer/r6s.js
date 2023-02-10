@@ -22,23 +22,6 @@
 
     let mode;
 
-    /*
-    ;    default (ping based)
-    ;    playfab/australiaeast
-    ;    playfab/brazilsouth
-    ;    playfab/centralus
-    ;    playfab/eastasia
-    ;    playfab/eastus
-    ;    playfab/japaneast
-    ;    playfab/northeurope
-    ;    playfab/southafricanorth
-    ;    playfab/southcentralus
-    ;    playfab/southeastasia
-    ;    playfab/uaenorth
-    ;    playfab/westeurope
-    ;    playfab/westus
-    */
-
     const servers = {
         "default": "default (ping based)",
         "playfab/australiaeast": "eastern australia",
@@ -88,6 +71,15 @@
         const index = lines.findIndex(line => line.startsWith(setting))
         const res = setting + '=' + value
         lines[index] = res
+        for (let i = 77; i <= 138; i++) {
+            const line = lines[i]
+            const keyValue = line.split('=')
+            if (keyValue != undefined && keyValue[0] != undefined && keyValue[1] != undefined) {
+                const key = keyValue[0]
+                const value = keyValue[1]
+                inputOpts[key] = value
+            }
+        }
         inputValues = Object.keys(inputOpts).map((key) => ({
             name: key + " = " + inputOpts[key],
             value: key
