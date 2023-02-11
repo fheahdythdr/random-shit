@@ -1,5 +1,4 @@
 -- // Yes, some of this code is skidded from IY.
-print("Yes, some of this code is skidded from IY, I did not want to figure out how to do float.")
 local ResponseTest1
 local ResponseTest2
 local Clip
