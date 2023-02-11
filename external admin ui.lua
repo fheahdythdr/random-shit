@@ -17,7 +17,6 @@ local plrhrp = plrw:FindFirstChild('HumanoidRootPart')
 local RunService = game:GetService('RunService')
 local workspace = game:GetService('Workspace')
 local MPos = plr:GetMouse()
-local gs = GetService
 local notif = loadstring(game:HttpGet('https://raw.githubusercontent.com/fheahdythdr/ui-libs-ui-lib-backups/main/function%20things/notifs.lua'))() 
 local SendNotif = notif:Init()
 plr.CharacterAdded:Connect(function(nchar)
